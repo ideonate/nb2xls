@@ -44,15 +44,40 @@ class XLSExporter(Exporter):
             resources['language'] = nb['metadata']['language'].lower()
 
         # Preprocess
-        nb_copy, resources = self._preprocess(nb_copy, resources)
+        nb_copy, resources = super(XLSExporter, self).from_notebook_node(nb, resources, **kw)
 
         output = BytesIO()
-        workbook = xlsxwriter.Workbook(output)
-        worksheet = workbook.add_worksheet()
+        self.workbook = xlsxwriter.Workbook(output)
+        self.worksheet = self.workbook.add_worksheet()
 
-        worksheet.write('A1', 'Hello')
-        workbook.close()
+        self.row = 0
+        for cellno, cell in enumerate(nb_copy.cells):
+            self.worksheet.write(self.row, 0, str(cellno+1))
+
+            if cell.cell_type == 'markdown':
+                self._write_textplain(cell.source)
+
+            elif cell.cell_type == 'code':
+                for o in cell.outputs:
+                    self._write_code(o)
+
+            self.row += 1
+
+        self.workbook.close()
 
         xlsx_data = output.getvalue()
 
         return xlsx_data, resources
+
+    def _write_code(self, o):
+        if o.output_type == 'stream':
+            self._write_textplain('stream : '+o.text)
+        if o.output_type in ('display_data', 'execute_result'):
+            self._write_textplain('text plain : '+o.data['text/plain'])
+
+    def _write_textplain(self, text):
+        lines = text.split("\n")
+        print(lines)
+        for l in lines:
+            self.worksheet.write(self.row, 1, l)
+            self.row += 1
