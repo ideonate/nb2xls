@@ -26,7 +26,7 @@ class XLSExporter(Exporter):
     # If this custom exporter should add an entry to the
     # "File -> Download as" menu in the notebook, give it a name here in the
     # `export_from_notebook` class member
-    export_from_notebook = "XLS format"
+    export_from_notebook = "Excel Spreadsheet"
 
     def _file_extension_default(self):
         """
@@ -80,6 +80,11 @@ class XLSExporter(Exporter):
         return xlsx_data, resources
 
     def _write_code(self, o):
+        """
+        Main handler for code cells
+        :param o:
+        :return:
+        """
         if o.output_type == 'stream':
             self._write_textplain(o.text)
         if o.output_type in ('display_data', 'execute_result'):
@@ -95,11 +100,16 @@ class XLSExporter(Exporter):
             elif 'text/plain' in o.data:
                 self._write_textplain(o.data['text/plain'])
 
+    ###
+    # Sub-handlers for code cells
+
     def _write_textplain(self, text):
         lines = text.split("\n")
         for l in lines:
             self.worksheet.write(self.row, 1, l)
             self.row += 1
+
+    # HTML functions start here
 
     def _write_texthtml(self, html):
         soup = BeautifulSoup(html, 'html.parser')
@@ -135,9 +145,17 @@ class XLSExporter(Exporter):
             for child in tablerow.children:
                 if isinstance(child, Tag):
                     if child.name == 'th' or child.name == 'td':
-                        self.worksheet.write(self.row, col, child.get_text())
+                        s = child.get_text()
+                        try:
+                            f = float(s)
+                            self.worksheet.write_number(self.row, col, f)
+                        except ValueError:
+                            self.worksheet.write(self.row, col, s)
+
                         col += 1
             self.row += 1
+
+    # Image handler
 
     def _write_image(self, image, want_width, want_height):
 
