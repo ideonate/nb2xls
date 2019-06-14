@@ -5,11 +5,17 @@ line.
 
 Respects tables such as Pandas DataFrames. Also exports image data such as matplotlib output.
 
+Markdown also supported where possible (some elements still need work).
+
 This allows you to share your results with non-programmers such that they can still easily play with the data.
 
 ## Installation
 
-pip install coming soon...
+### Install via pip (recommended)
+
+```
+pip install nb2xls
+```
 
 ### Development Mode
 
