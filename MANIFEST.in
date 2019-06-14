@@ -1,0 +1,4 @@
+# Misc
+include requirements.txt
+include LICENSE
+global-exclude *.py[co]
