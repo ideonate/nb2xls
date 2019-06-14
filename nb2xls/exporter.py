@@ -65,7 +65,7 @@ class XLSExporter(Exporter):
             self.worksheet.write(self.row, 0, str(cellno+1))
 
             if cell.cell_type == 'markdown':
-                self._write_textplain(cell.source)
+                self._write_markdown(cell.source)
 
             elif cell.cell_type == 'code':
                 for o in cell.outputs:
@@ -186,3 +186,8 @@ class XLSExporter(Exporter):
         self.worksheet.set_row(self.row, height*y_scale)
 
         self.row += 1
+
+    # Markdown handler
+
+    def _write_markdown(self, md):
+        self._write_textplain(self, md)

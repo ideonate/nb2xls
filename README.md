@@ -25,7 +25,7 @@ Restart Jupyter to pick up the new 'Excel Spreadsheet (.xlsx)' option under 'Dow
 
 ## Usage
 
-In Jupyter Notebook, just select 'Excel Spreadsheet (.xlsx)' option under 'Download As' in the File menu.
+In Jupyter Notebook, just select the 'Excel Spreadsheet (.xlsx)' option under 'Download As' in the File menu.
 
 To run from the command line try:
 
