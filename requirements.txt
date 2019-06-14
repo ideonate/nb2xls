@@ -2,3 +2,4 @@ nbconvert
 xlsxwriter
 beautifulsoup4
 pypng
+mistune

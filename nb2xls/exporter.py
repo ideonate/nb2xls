@@ -9,6 +9,10 @@ from bs4 import BeautifulSoup
 from bs4.element import NavigableString, Tag
 import xlsxwriter
 
+import mistune
+from .mdrenderer import Md2XLSRenderer, MdStyleInstruction
+from .mdxlsstyles import MdXlsStyleRegistry
+
 try:
     import cv2 # Prefer Open CV2 but don't put in requirements.txt because it can be difficult to install
     import numpy as np
@@ -20,13 +24,32 @@ except ImportError:
 
 class XLSExporter(Exporter):
     """
-    My custom exporter
+    XLSX custom exporter
     """
 
     # If this custom exporter should add an entry to the
     # "File -> Download as" menu in the notebook, give it a name here in the
     # `export_from_notebook` class member
     export_from_notebook = "Excel Spreadsheet"
+
+    def __init__(self, config=None, **kw):
+        """
+        Public constructor
+
+        Parameters
+        ----------
+        config : :class:`~traitlets.config.Config`
+            User configuration instance.
+        `**kw`
+            Additional keyword arguments passed to parent __init__
+
+        """
+
+        super(XLSExporter, self).__init__(config=config, **kw)
+
+        self.msxlsstylereg = None
+        self.workbook = None
+        self.row = 0
 
     def _file_extension_default(self):
         """
@@ -58,6 +81,9 @@ class XLSExporter(Exporter):
 
         output = BytesIO()
         self.workbook = xlsxwriter.Workbook(output)
+
+        self.msxlsstylereg = MdXlsStyleRegistry(self.workbook)
+
         self.worksheet = self.workbook.add_worksheet()
 
         self.row = 0
@@ -190,4 +216,24 @@ class XLSExporter(Exporter):
     # Markdown handler
 
     def _write_markdown(self, md):
-        self._write_textplain(self, md)
+        try:
+            markdown = mistune.Markdown(renderer=Md2XLSRenderer())
+            lines = markdown(md)
+            
+            for l in lines:
+                o = [self.msxlsstylereg.get_style(s.mdname) if isinstance(s, MdStyleInstruction) else s for s in l]
+                #print(o)
+                if len(o) > 2:
+                    self.worksheet.write_rich_string(self.row, 1, *o)
+                elif len(o) == 2:
+                    if isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
+                        self.worksheet.write(self.row, 1, o[1], o[0])
+                    elif not isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
+                        self.worksheet.write(self.row, 1, o[0] + ' ' + o[1])
+                elif len(o) == 1 and not isinstance(o[0], xlsxwriter.format.Format):
+                    self.worksheet.write(self.row, 1, o[0])
+
+                self.row += 1
+        except Exception as e:
+            print('Markdown Exception: ', e)
+            self._write_textplain(md)
