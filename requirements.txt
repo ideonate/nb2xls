@@ -1,2 +1,4 @@
 nbconvert
 xlsxwriter
+beautifulsoup4
+pypng
