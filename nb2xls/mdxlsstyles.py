@@ -17,20 +17,31 @@ class MdXlsStyleRegistry(object):
         self.workbook = workbook
         self.stylereg = {}
 
-    def get_style(self, mdname):
+    def use_style(self, mdnames):
+
+        if not isinstance(mdnames, list):
+            mdnames = [mdnames]
+
+        mdname = '-'.join(mdnames)
 
         if not mdname in self.stylereg:
 
-            style = self._create_style(mdname)
+            style = self._create_style(mdnames)
 
             self.stylereg[mdname] = style
 
         return self.stylereg[mdname]
 
-    def _create_style(self, mdname):
+    def _create_style(self, mdnames):
 
-        if mdname in self.default_formats:
-            d = self.default_formats[mdname]
+        d = {}
+
+        for submdname in mdnames:
+
+            if submdname in self.default_formats:
+                d = {**d, **self.default_formats[submdname]}
+
+        if len(d) > 0:
             return self.workbook.add_format(d)
 
         return ''

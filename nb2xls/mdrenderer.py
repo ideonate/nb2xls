@@ -5,12 +5,39 @@ from mistune import Renderer, escape, escape_link
 
 class MdStyleInstruction(object):
 
+    softnewline = False
+
     def __init__(self, mdname):
         self.mdname = mdname
 
     def __repr__(self):
         params = ['{}={}'.format(a, getattr(self,a)) for a in dir(self) if not a.startswith('__') and not callable(getattr(self,a))]
         return '<{} {}>'.format(type(self), ", ".join(params))
+
+
+class MdStyleInstructionCell(MdStyleInstruction):
+    pass
+
+
+class MdStyleInstructionText(MdStyleInstruction):
+    pass
+
+
+class MdStyleInstructionLink(MdStyleInstruction):
+
+    softnewline = True
+
+    def __init__(self, link):
+        super(MdStyleInstructionLink, self).__init__('link')
+        self.link = link
+
+
+class MdStyleInstructionList(MdStyleInstruction):
+
+    softnewline = True
+
+    def __init__(self):
+        super(MdStyleInstructionList, self).__init__('list_item')
 
 
 class Md2XLSRenderer(Renderer):
@@ -60,25 +87,22 @@ class Md2XLSRenderer(Renderer):
         :param level: a number for the header level, for example: 1.
         :param raw: raw text content of the header.
         """
-        return [[MdStyleInstruction('h{}'.format(level))] + text]
+        return [[MdStyleInstructionCell('h{}'.format(level))] + text]
 
     def hrule(self):
         """Rendering method for ``<hr>`` tag."""
-        return [MdStyleInstruction('hrule')]
+        return [MdStyleInstructionCell('hrule')]
 
     def list(self, body, ordered=True):
         """Rendering list tags like ``<ul>`` and ``<ol>``.
         :param body: body contents of the list.
         :param ordered: whether this list is ordered or not.
         """
-        tag = 'ul'
-        if ordered:
-            tag = 'ol'
-        return ['<%s>\n%s</%s>\n' % (tag, body, tag)]
+        return body
 
     def list_item(self, text):
         """Rendering list item snippet. Like ``<li>``."""
-        return text
+        return [[MdStyleInstructionList(), *text]]
 
     def paragraph(self, text):
         """Rendering paragraph tags. Like ``<p>``."""
@@ -89,16 +113,13 @@ class Md2XLSRenderer(Renderer):
         :param header: header part of the table.
         :param body: body part of the table.
         """
-        return (
-                   '<table>\n<thead>%s</thead>\n'
-                   '<tbody>\n%s</tbody>\n</table>\n'
-               ) % (header, body)
+        return header + body
 
     def table_row(self, content):
         """Rendering a table row. Like ``<tr>``.
         :param content: content of current table row.
         """
-        return ['<tr>\n%s</tr>\n' % content]
+        return ['<tr>\n%s</tr>\n'] + content
 
     def table_cell(self, content, **flags):
         """Rendering a table cell. Like ``<th>`` ``<td>``.
@@ -115,20 +136,20 @@ class Md2XLSRenderer(Renderer):
         """Rendering **strong** text.
         :param text: text content for emphasis.
         """
-        return [MdStyleInstruction('double_emphasis')] + text
+        return [MdStyleInstructionText('double_emphasis')] + text
 
     def emphasis(self, text):
         """Rendering *emphasis* text.
         :param text: text content for emphasis.
         """
-        return [MdStyleInstruction('emphasis')] + text
+        return [MdStyleInstructionText('emphasis')] + text
 
     def codespan(self, text):
         """Rendering inline `code` text.
         :param text: text content for inline code.
         """
         text = escape(text.rstrip(), smart_amp=False)
-        return [MdStyleInstruction('codespan')] + text
+        return [MdStyleInstructionText('codespan')] + text
 
     def linebreak(self):
         """Rendering line break like ``<br>``."""
@@ -139,7 +160,7 @@ class Md2XLSRenderer(Renderer):
         """Rendering ~~strikethrough~~ text.
         :param text: text content for strikethrough.
         """
-        return [MdStyleInstruction('strikethrough')] + text
+        return [MdStyleInstructionText('strikethrough')] + text
 
     def text(self, text):
         """Rendering unformatted text.
@@ -161,7 +182,7 @@ class Md2XLSRenderer(Renderer):
         text = link = escape_link(link)
         if is_email:
             link = 'mailto:%s' % link
-        return '<a href="%s">%s</a>' % (link, text)
+        return [MdStyleInstructionLink(link)] + text
 
     def link(self, link, title, text):
         """Rendering a given link with content and title.
@@ -170,10 +191,7 @@ class Md2XLSRenderer(Renderer):
         :param text: text content for description.
         """
         link = escape_link(link)
-        if not title:
-            return '<a href="%s">%s</a>' % (link, text)
-        title = escape(title, quote=True)
-        return '<a href="%s" title="%s">%s</a>' % (link, title, text)
+        return [MdStyleInstructionLink(link)] + text
 
     def image(self, src, title, text):
         """Rendering a image with title and text.
