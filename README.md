@@ -14,6 +14,10 @@ This allows you to share your results with non-programmers such that they can st
 Please note this is an ALPHA version. Some features may be lost. Please send example ipynb files to me along with 
 reports of any problems.
 
+Try it out for free online through Binder:
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/ideonate/nb2xls/master)
+
 ## Installation
 
 ### Install via pip (recommended)
