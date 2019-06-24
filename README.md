@@ -9,6 +9,11 @@ Markdown also supported where possible (some elements still need work).
 
 This allows you to share your results with non-programmers such that they can still easily play with the data.
 
+![Screenshot of Jupyter Notebook exported to Excel spreadsheet](screenshots/Jupyter2Excel.png)
+
+Please note this is an ALPHA version. Some features may be lost. Please send example ipynb files to me along with 
+reports of any problems.
+
 ## Installation
 
 ### Install via pip (recommended)
