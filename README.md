@@ -5,7 +5,9 @@ line.
 
 Respects tables such as Pandas DataFrames. Also exports image data such as matplotlib output.
 
-Markdown also supported where possible (some elements still need work).
+Markdown is supported where possible (some elements still need work). 
+
+Input (code) cells are not included in the spreadsheet.
 
 This allows you to share your results with non-programmers such that they can still easily play with the data.
 
