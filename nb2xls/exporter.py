@@ -2,8 +2,11 @@ import copy
 from io import BytesIO
 import re
 import base64
+from math import ceil
 
 from nbconvert.exporters import Exporter
+
+from traitlets import Bool
 
 from bs4 import BeautifulSoup
 from bs4.element import NavigableString, Tag
@@ -11,7 +14,9 @@ import xlsxwriter
 
 import mistune
 from .mdrenderer import Md2XLSRenderer, \
-    MdStyleInstructionCell, MdStyleInstructionText, MdStyleInstructionLink, MdStyleInstructionList
+    MdStyleInstructionCell, MdStyleInstructionText, MdStyleInstructionLink, MdStyleInstructionListItem, \
+    MdStyleInstructionLineBreak, MdStyleInstructionListStart, MdStyleInstructionListEnd
+
 from .mdxlsstyles import MdXlsStyleRegistry
 
 try:
@@ -32,6 +37,10 @@ class XLSExporter(Exporter):
     # "File -> Download as" menu in the notebook, give it a name here in the
     # `export_from_notebook` class member
     export_from_notebook = "Excel Spreadsheet"
+
+    ignore_markdown_errors = Bool(True, help="""
+        Set ignore_markdown_errors to False in order to throw an exception with any md errors. 
+    """).tag(config=True)
 
     def __init__(self, config=None, **kw):
         """
@@ -210,100 +219,130 @@ class XLSExporter(Exporter):
 
         self.worksheet.insert_image(self.row, 1, 'image.png',
                                     {'image_data': image_data, 'x_scale': x_scale, 'y_scale': y_scale})
-        self.worksheet.set_row(self.row, height*y_scale)
 
-        self.row += 1
+        self.row += ceil(height*y_scale / 15) # 15 is default row height in Excel
 
     # Markdown handler
 
     def _write_markdown(self, md):
-        try:
-            markdown = mistune.Markdown(renderer=Md2XLSRenderer())
-            lines = markdown(md)
+        if self.ignore_markdown_errors:
+            try:
+                self._write_markdown_core(md)
+            except Exception as e:
+                print('Markdown Exception: ', e)
+                self._write_textplain(md)
+        else:
+            self._write_markdown_core(md)
 
-            all_o = []
+    def _write_markdown_core(self, md):
+        markdown = mistune.Markdown(renderer=Md2XLSRenderer())
+        lines = markdown(md)
 
-            for l in lines:
-                in_softnewline = False
-                is_indented = False
-                link_url = ''
-                already_outputted_text = False
-                cell_format_mdname = ''
-                o = []
-                mdtextstylenames = []
-                for i,s in enumerate(l):
-                    if isinstance(s, MdStyleInstructionText):
-                        mdtextstylenames += [s.mdname]
+        all_o = []
 
-                    elif isinstance(s, MdStyleInstructionCell):
-                        cell_format_mdname = s.mdname
+        for l in lines:
+            in_softnewline = False
+            is_indented = 0
+            link_url = ''
+            already_outputted_text = False
+            cell_format_mdname = ''
+            o = []
+            mdtextstylenames = []
+            for i,s in enumerate(l):
+                if isinstance(s, MdStyleInstructionText):
+                    mdtextstylenames += [s.mdname]
 
-                    elif isinstance(s, MdStyleInstructionLink):
-                        if already_outputted_text:
-                            all_o.append([o, cell_format_mdname, link_url, is_indented])
-                            o = []
-                            already_outputted_text = False
-                        in_softnewline = True
-                        link_url = s.link
+                elif isinstance(s, MdStyleInstructionCell):
+                    cell_format_mdname = s.mdname
 
-                    elif isinstance(s, MdStyleInstructionList):
-                        if already_outputted_text:
-                            all_o.append([o, cell_format_mdname, link_url, is_indented])
-                            o = []
-                            already_outputted_text = False
-                        in_softnewline = True
+                elif isinstance(s, MdStyleInstructionLink):
+                    if already_outputted_text:
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+                    in_softnewline = True
+                    link_url = s.link
+
+                elif isinstance(s, MdStyleInstructionListStart):
+                    if already_outputted_text:
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+
+                    is_indented += 1
+
+                elif isinstance(s, MdStyleInstructionListEnd):
+
+                    if already_outputted_text:
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+
+                    is_indented -= 1
+                    in_softnewline = True
+                    link_url = ''
+
+                elif isinstance(s, MdStyleInstructionListItem):
+                    if already_outputted_text:
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+                    in_softnewline = True
+                    link_url = ''
+
+                elif isinstance(s, MdStyleInstructionLineBreak):
+                    if already_outputted_text:
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+                    in_softnewline = True
+                    link_url = ''
+
+                elif len(s) > 0:
+                    if len(mdtextstylenames) > 0 or (cell_format_mdname != '' and i >= 2):
+                        fmt = self.msxlsstylereg.use_style([cell_format_mdname] + mdtextstylenames)
+                        o.append(fmt)
+                        mdtextstylenames = []
+
+                    o.append(s)
+                    already_outputted_text = True
+
+                    if in_softnewline and link_url != '':
+                        all_o.append([o, cell_format_mdname, link_url, is_indented])
+                        o = []
+                        already_outputted_text = False
+                        in_softnewline = False
                         link_url = ''
-                        is_indented = True
 
-                    elif len(s) > 0:
-                        if len(mdtextstylenames) > 0 or (cell_format_mdname != '' and i >= 2):
-                            format = self.msxlsstylereg.use_style([cell_format_mdname] + mdtextstylenames)
-                            o.append(format)
-                            mdtextstylenames = []
+            if len(o) > 0:
+                all_o.append([o, cell_format_mdname, link_url, is_indented])
 
-                        o.append(s)
-                        already_outputted_text = True
+        for o, cell_format_mdname, link_url, is_indented in all_o:
 
-                        if in_softnewline:
-                            all_o.append([o, cell_format_mdname, link_url, is_indented])
-                            o = []
-                            already_outputted_text = False
-                            in_softnewline = False
-                            is_indented = False
-                            link_url = ''
+            if cell_format_mdname != '':
+                o.append(self.msxlsstylereg.use_style(cell_format_mdname))
 
-                if len(o) > 0:
-                    all_o.append([o, cell_format_mdname, link_url, is_indented])
+            if link_url != '':
+                if len(o) >= 2:
+                    self.worksheet.write_url(self.row, 1+is_indented, link_url, o[1], o[0])
+                elif len(o) == 1:
+                    self.worksheet.write_url(self.row, 1+is_indented, link_url, None, o[0])
 
-            for o, cell_format_mdname, link_url, is_indented in all_o:
+            else:
 
-                is_indented = int(is_indented)
+                #o = [output for output in o if not (isinstance(output, str) and output == '')]
 
-                if cell_format_mdname != '':
-                    o.append(self.msxlsstylereg.use_style(cell_format_mdname))
+                if len(o) > 2:
+                    self.worksheet.write_rich_string(self.row, 1+is_indented, *o)
+                elif len(o) == 2:
+                    if isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
+                        self.worksheet.write(self.row, 1+is_indented, o[1], o[0])
+                    elif not isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
+                        self.worksheet.write(self.row, 1+is_indented, o[0] + ' ' + o[1])
+                    else:
+                        self.worksheet.write(self.row, 1+is_indented, o[0], o[1])
+                elif len(o) == 1 and not isinstance(o[0], xlsxwriter.format.Format):
+                    self.worksheet.write(self.row, 1+is_indented, o[0])
 
-                if link_url != '':
-                    if len(o) >= 2:
-                        self.worksheet.write_url(self.row, 1+is_indented, link_url, o[1], o[0])
-                    elif len(o) == 1:
-                        self.worksheet.write_url(self.row, 1+is_indented, link_url, None, o[0])
+            self.row += 1
 
-                else:
-
-                    if len(o) > 2:
-                        self.worksheet.write_rich_string(self.row, 1+is_indented, *o)
-                    elif len(o) == 2:
-                        if isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
-                            self.worksheet.write(self.row, 1+is_indented, o[1], o[0])
-                        elif not isinstance(o[0], xlsxwriter.format.Format) and not isinstance(o[1], xlsxwriter.format.Format):
-                            self.worksheet.write(self.row, 1+is_indented, o[0] + ' ' + o[1])
-                        else:
-                            self.worksheet.write(self.row, 1+is_indented, o[0], o[1])
-                    elif len(o) == 1 and not isinstance(o[0], xlsxwriter.format.Format):
-                        self.worksheet.write(self.row, 1+is_indented, o[0])
-
-                self.row += 1
-
-        except Exception as e:
-            print('Markdown Exception: ', e)
-            self._write_textplain(md)

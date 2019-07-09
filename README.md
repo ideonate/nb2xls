@@ -47,6 +47,12 @@ In Jupyter Notebook, just select the 'Excel Spreadsheet (.xlsx)' option under 'D
 To run from the command line try:
 
 ```
+jupyter nbconvert --to xls Examples/ExcelTest1.ipynb
+```
+
+or
+
+```
 jupyter nbconvert --to nb2xls.XLSExporter Examples/ExcelTest1.ipynb
 ```
 

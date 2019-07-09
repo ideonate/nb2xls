@@ -32,12 +32,38 @@ class MdStyleInstructionLink(MdStyleInstruction):
         self.link = link
 
 
-class MdStyleInstructionList(MdStyleInstruction):
+class MdStyleInstructionListStart(MdStyleInstruction):
+
+    softnewline = True
+    ordered = True
+
+    def __init__(self, ordered):
+        super(MdStyleInstructionListStart, self).__init__('link')
+        self.ordered = ordered
+
+
+class MdStyleInstructionListEnd(MdStyleInstruction):
+
+    softnewline = False
+
+    def __init__(self):
+        super(MdStyleInstructionListEnd, self).__init__('link')
+
+
+class MdStyleInstructionListItem(MdStyleInstruction):
 
     softnewline = True
 
     def __init__(self):
-        super(MdStyleInstructionList, self).__init__('list_item')
+        super(MdStyleInstructionListItem, self).__init__('list_item')
+
+
+class MdStyleInstructionLineBreak(MdStyleInstruction):
+
+    softnewline = True
+
+    def __init__(self):
+        super(MdStyleInstructionLineBreak, self).__init__('linebreak')
 
 
 class Md2XLSRenderer(Renderer):
@@ -98,11 +124,12 @@ class Md2XLSRenderer(Renderer):
         :param body: body contents of the list.
         :param ordered: whether this list is ordered or not.
         """
-        return body
+        return [[MdStyleInstructionListStart(ordered)]] + body + [[MdStyleInstructionListEnd()]]
 
     def list_item(self, text):
         """Rendering list item snippet. Like ``<li>``."""
-        return [[MdStyleInstructionList(), *text]]
+        #return [[MdStyleInstructionList(), *text]]
+        return [[MdStyleInstructionListItem()] + text]
 
     def paragraph(self, text):
         """Rendering paragraph tags. Like ``<p>``."""
@@ -148,13 +175,14 @@ class Md2XLSRenderer(Renderer):
         """Rendering inline `code` text.
         :param text: text content for inline code.
         """
-        text = escape(text.rstrip(), smart_amp=False)
+        if isinstance(text, str):
+            text = [' {} '.format(text)]
         return [MdStyleInstructionText('codespan')] + text
 
     def linebreak(self):
         """Rendering line break like ``<br>``."""
 
-        return ["<lb>"]
+        return [MdStyleInstructionLineBreak()]
 
     def strikethrough(self, text):
         """Rendering ~~strikethrough~~ text.

@@ -62,13 +62,13 @@ setup(
     license=license,
     classifiers=classifiers,
     include_package_data=include_package_data,
-    #data_files=data_files,
     install_requires=install_requires,
     zip_safe=zip_safe,
 
     entry_points = {
         'nbconvert.exporters': [
-            'xls = nb2xls:XLSExporter'
+            'xls = nb2xls:XLSExporter',
+            'xlsx = nb2xls:XLSExporter'
         ],
     }
 )
