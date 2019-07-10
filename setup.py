@@ -70,8 +70,7 @@ setup(
 
     entry_points = {
         'nbconvert.exporters': [
-            'xls = nb2xls:XLSExporter',
-            'xlsx = nb2xls:XLSExporter'
+            'xls = nb2xls:XLSExporter'
         ],
     }
 )
