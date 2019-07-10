@@ -22,20 +22,10 @@ Try it out for free online through Binder:
 
 ## Installation
 
-### Install via pip (recommended)
+Install via pip (recommended)
 
 ```
 pip install nb2xls
-```
-
-### Development Mode
-
-If you want to contribute or debug:
-
-```
-git clone https://github.com/ideonate/nb2xls
-cd nb2xls
-pip install -e .
 ```
 
 Restart Jupyter to pick up the new 'Excel Spreadsheet (.xlsx)' option under 'Download As' in the File menu.
@@ -57,6 +47,27 @@ jupyter nbconvert --to nb2xls.XLSExporter Examples/ExcelTest.ipynb
 ```
 
 This should output ExcelTest1.xlsx in the same folder as the ipynb file specified.
+
+## Development Installation
+
+If you want to contribute or debug:
+
+```
+git clone https://github.com/ideonate/nb2xls
+cd nb2xls
+pip install -e .
+```
+
+To run tests, you will need to install some extra dependencies. Run:
+ ```
+pip install -e .[test]
+```
+
+Then run:
+```
+pytest
+```
+
 
 ## Contact for Feedback
 
