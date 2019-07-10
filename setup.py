@@ -43,9 +43,11 @@ classifiers = ['Development Status :: 4 - Beta',
                ]
 include_package_data = True
 
-#install_requires = install_requires
 zip_safe = False
 
+extra_requirements = {
+    'test': ['pytest', 'testpath', 'openpyxl']
+}
 
 # ref https://packaging.python.org/tutorials/distributing-packages/
 setup(
@@ -63,6 +65,7 @@ setup(
     classifiers=classifiers,
     include_package_data=include_package_data,
     install_requires=install_requires,
+    extras_require=extra_requirements,
     zip_safe=zip_safe,
 
     entry_points = {

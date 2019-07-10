@@ -4,6 +4,7 @@ import pytest
 from testpath.tempdir import TemporaryWorkingDirectory
 from nb2xls.exporter import XLSExporter
 
+# This should be discoverable by pytest only
 from localxlsxdiff.compare import diff
 
 
