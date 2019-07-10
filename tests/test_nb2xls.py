@@ -48,12 +48,22 @@ class TestsExcelExporter(LocalExportersTestsBase):
         (output, resources) = XLSExporter().from_filename(self._get_notebook('ExcelTest5.ipynb'))
         assert len(output) > 0
 
-    @pytest.mark.parametrize("ipynb_filename", ["ExcelTest4.ipynb", "NestedMarkdown1.ipynb", "ExcelTest.ipynb"])
-    def test_export_compare(self, ipynb_filename):
+    @pytest.mark.parametrize("ipynb_filename,expected_size",
+                             [
+                                ("ExcelTest4.ipynb", 42343),
+                                ("NestedMarkdown1.ipynb", 6227),
+                                ("ExcelTest.ipynb", 5455)]
+                             )
+    def test_export_compare(self, ipynb_filename, expected_size):
         """
         Does a XLSExporter export the same thing as before?
         """
         (other, resources) = XLSExporter().from_filename(self._get_notebook(ipynb_filename))
+
+        if expected_size != -1:
+            # Check file size is about right
+            len_other = len(other)
+            assert len_other >= expected_size-10 and len_other <= expected_size+10
 
         with self.create_temp_cwd() as temp_cwd:
 

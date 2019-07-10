@@ -2,7 +2,7 @@ import copy
 from io import BytesIO
 import re
 import base64
-import collections
+from collections.abc import Iterable
 from math import ceil
 
 from nbconvert.exporters import Exporter
@@ -248,7 +248,7 @@ class XLSExporter(Exporter):
             :return: single-depth flattened version of the array containing only the leaves
             """
             for el in l:
-                if isinstance(el, collections.Iterable) and not isinstance(el, str):
+                if isinstance(el, Iterable) and not isinstance(el, str):
                     for sub in flatten(el):
                         yield sub
                 else:
