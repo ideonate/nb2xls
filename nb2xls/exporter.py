@@ -2,6 +2,7 @@ import copy
 from io import BytesIO
 import re
 import base64
+import collections
 from math import ceil
 
 from nbconvert.exporters import Exporter
@@ -40,6 +41,8 @@ class XLSExporter(Exporter):
 
     ignore_markdown_errors = Bool(True, help="""
         Set ignore_markdown_errors to False in order to throw an exception with any md errors. 
+        From nbconvert command line for example:
+        jupyter nbconvert --to xls Examples/Test.ipynb --XLSExporter.ignore_markdown_errors=False
     """).tag(config=True)
 
     def __init__(self, config=None, **kw):
@@ -238,6 +241,19 @@ class XLSExporter(Exporter):
         markdown = mistune.Markdown(renderer=Md2XLSRenderer())
         lines = markdown(md)
 
+        def flatten(l):
+            """
+            Nested lists cause problems due to the way the MD parser works.
+            :param l: arbitrary-depth nested list of strs and MdStyleInstruction objects
+            :return: single-depth flattened version of the array containing only the leaves
+            """
+            for el in l:
+                if isinstance(el, collections.Iterable) and not isinstance(el, str):
+                    for sub in flatten(el):
+                        yield sub
+                else:
+                    yield el
+
         all_o = []
 
         for l in lines:
@@ -248,7 +264,7 @@ class XLSExporter(Exporter):
             cell_format_mdname = ''
             o = []
             mdtextstylenames = []
-            for i,s in enumerate(l):
+            for i,s in enumerate(flatten(l)):
                 if isinstance(s, MdStyleInstructionText):
                     mdtextstylenames += [s.mdname]
 

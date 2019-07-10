@@ -3,7 +3,7 @@
 
 import nbformat
 
-fn = "./Examples/Israel9-small.ipynb"
+fn = "./Examples/Israel12.ipynb"
 
 with open(fn, "rt") as f:
     jsontext = f.read()
