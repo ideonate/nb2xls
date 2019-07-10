@@ -48,7 +48,7 @@ class TestsExcelExporter(LocalExportersTestsBase):
         (output, resources) = XLSExporter().from_filename(self._get_notebook('ExcelTest5.ipynb'))
         assert len(output) > 0
 
-    @pytest.mark.parametrize("ipynb_filename", ["ExcelTest4.ipynb", "NestedMarkdown1.ipynb"])
+    @pytest.mark.parametrize("ipynb_filename", ["ExcelTest4.ipynb", "NestedMarkdown1.ipynb", "ExcelTest.ipynb"])
     def test_export_compare(self, ipynb_filename):
         """
         Does a XLSExporter export the same thing as before?

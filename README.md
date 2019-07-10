@@ -47,13 +47,13 @@ In Jupyter Notebook, just select the 'Excel Spreadsheet (.xlsx)' option under 'D
 To run from the command line try:
 
 ```
-jupyter nbconvert --to xls Examples/ExcelTest1.ipynb
+jupyter nbconvert --to xls Examples/ExcelTest.ipynb
 ```
 
 or
 
 ```
-jupyter nbconvert --to nb2xls.XLSExporter Examples/ExcelTest1.ipynb
+jupyter nbconvert --to nb2xls.XLSExporter Examples/ExcelTest.ipynb
 ```
 
 This should output ExcelTest1.xlsx in the same folder as the ipynb file specified.

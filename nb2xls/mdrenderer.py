@@ -194,7 +194,7 @@ class Md2XLSRenderer(Renderer):
         """Rendering unformatted text.
         :param text: text content.
         """
-        return [escape(text)]
+        return [text]
 
     def escape(self, text):
         """Rendering escape sequence.
