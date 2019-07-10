@@ -254,6 +254,9 @@ class XLSExporter(Exporter):
                 else:
                     yield el
 
+        list_counters = []
+        list_ordered = []
+
         all_o = []
 
         for l in lines:
@@ -286,6 +289,8 @@ class XLSExporter(Exporter):
                         already_outputted_text = False
 
                     is_indented += 1
+                    list_counters.append(1)
+                    list_ordered.append(s.ordered)
 
                 elif isinstance(s, MdStyleInstructionListEnd):
 
@@ -295,6 +300,10 @@ class XLSExporter(Exporter):
                         already_outputted_text = False
 
                     is_indented -= 1
+
+                    list_counters.pop()
+                    list_ordered.pop()
+
                     in_softnewline = True
                     link_url = ''
 
@@ -305,6 +314,11 @@ class XLSExporter(Exporter):
                         already_outputted_text = False
                     in_softnewline = True
                     link_url = ''
+
+                    li_count = list_counters[-1]
+                    if list_ordered[-1]:
+                        o = ['{}. '.format(li_count)]
+                    list_counters[-1] += 1
 
                 elif isinstance(s, MdStyleInstructionLineBreak):
                     if already_outputted_text:
@@ -345,8 +359,6 @@ class XLSExporter(Exporter):
                     self.worksheet.write_url(self.row, 1+is_indented, link_url, None, o[0])
 
             else:
-
-                #o = [output for output in o if not (isinstance(output, str) and output == '')]
 
                 if len(o) > 2:
                     self.worksheet.write_rich_string(self.row, 1+is_indented, *o)
