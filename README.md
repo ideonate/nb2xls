@@ -68,6 +68,10 @@ Then run:
 pytest
 ```
 
+## Requirements
+
+nb2xls requires Python 3 and is tested against recent versions of jupyter and nbconvert. Please let me know if you 
+find incompatibilities   
 
 ## Contact for Feedback
 

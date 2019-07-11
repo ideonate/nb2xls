@@ -1,7 +1,7 @@
-nbconvert
-xlsxwriter
-beautifulsoup4
-pypng
-mistune
+nbconvert>=5.0.0
+xlsxwriter>=1.1.0
+beautifulsoup4>=4.6.0
+pypng>=0.0.18
+mistune>=0.8
 pandas
 numpy
