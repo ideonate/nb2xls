@@ -165,7 +165,7 @@ class XLSExporter(Exporter):
 
                 if len(s) > 0:
                     # Write accumulated string first
-                    re.sub('\s+', ' ', s)
+                    re.sub(r'\s+', ' ', s)
                     s = s.strip()
                     if len(s) > 0:
                         self.worksheet.write(self.row, 1, s.strip())
