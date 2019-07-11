@@ -46,7 +46,7 @@ or
 jupyter nbconvert --to nb2xls.XLSExporter Examples/ExcelTest.ipynb
 ```
 
-This should output ExcelTest1.xlsx in the same folder as the ipynb file specified.
+This should output ExcelTest.xlsx in the same folder as the ipynb file specified.
 
 ## Development Installation
 
