@@ -3,7 +3,7 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - pip install -e nb2xls
+  - pip install -e .
 # command to run tests
 script:
   # cd so we test the install, not the repo
