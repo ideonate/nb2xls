@@ -3,8 +3,10 @@ python:
   - "3.6"
 # command to install dependencies
 install:
-  - pip install -r requirements.txt
+  - pip install -e nb2xls
 # command to run tests
 script:
+  # cd so we test the install, not the repo
+  - cd `mktemp -d`
   - pytest
 
