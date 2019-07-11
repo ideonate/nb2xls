@@ -6,7 +6,5 @@ install:
   - pip install -e .
 # command to run tests
 script:
-  # cd so we test the install, not the repo
-  - cd `mktemp -d`
   - pytest
 
