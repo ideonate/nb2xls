@@ -81,3 +81,15 @@ example notebooks, especially if you have bug reports or feature suggestions.
 ## License
 
 This code is released under an MIT license.
+
+## Change Log
+
+0.1.2
+- Minor changes, mainly to deployment mechanism
+
+0.1.1
+- Displays images over multiple rows for better scrolling
+- Better markdown parsing especially for nested lists
+  
+0.0.1
+- Initial release 

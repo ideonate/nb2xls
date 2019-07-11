@@ -40,7 +40,9 @@ class TestsExcelExporter(LocalExportersTestsBase):
         """
         Can a XLSExporter be constructed?
         """
-        XLSExporter()
+        xls = XLSExporter()
+        assert xls.export_from_notebook == "Excel Spreadsheet"
+        assert xls._file_extension_default() == '.xlsx'
 
     def test_export_basic(self):
         """

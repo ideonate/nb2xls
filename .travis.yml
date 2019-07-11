@@ -1,11 +1,16 @@
 language: python
 python:
-  - "3.5"
-  - "3.6"
-# command to install dependencies
+- '3.5'
+- '3.6'
 install:
-  - pip install -e .[test]
-# command to run tests
+- pip install -e .[test]
 script:
-  - pytest
-
+- pytest
+deploy:
+  provider: pypi
+  user: ideonate
+  password:
+    secure: VPyYzGc+PNl4Khqd2K27JdKi+F0Skg9OOQd3VSMIGkPhxU1vazB/tvhOdyLiQKAJye4WxwRY90fNJrc4Bfl5/lFCSBQOmFlDHtf1WeaMTUr1dlWjgz7LM7Tqc7chVnLh2U0W7UJS7/bSMYE6pZle/TrFGF1YxwM+UetfPUlV72XA95Z3d+rP2IwARr7tk+xlDFJ1qNYHkM0QNJ9ZbHA335doHthExTRfPxthm1HzDvP/8CPay/6qis0xFjoN2tpEgVz1eaTdDR/gixGHjapmuyxYEzlSUtcLlneVUxr6Zt3ariGI/L8E8aRSJey/052Ukk5E6fLxleLF2GCpz6sww9DrY6n6JF5SnPgjTcC++cMSsFcrotGhH6XAI8v77JS0VEo499QmLu+XGKPxZhAXNDxMcFkpUY50cqIeSEjL5qSe7KCWgwGAZNmaDsJBeiZPLH0dASAAFkyk28Bc9ZhDwov1+pD2YYtixlChRlWCO91xXgigH8aGsMX7XkCxcvd85P8ZzUR6vRCi/s2VoLyN8LfmRO7/S62HTTqMC19ShrpoZgD8XaIzi2o8nzFfgtENV0k4udOSeUXuZZ5m/Awfi/yEpTGKs13u1bj8Uo9NmxA5CKLCV5IfJFgua2xmBdcWYbI6mI60E5Bw08QBkxJf8KuW41zlt7VzOjzjixaOXnE=
+  on:
+    tags: true
+  skip_existing: true

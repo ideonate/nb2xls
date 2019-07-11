@@ -12,6 +12,6 @@ def _get_version(version_info):
 
 # meta data - change alpha/dev to final for release
 
-version_info = (0, 1, 1, 'final', 0)
+version_info = (0, 1, 2, 'final', 0)
 __version__ = _get_version(version_info)
 
