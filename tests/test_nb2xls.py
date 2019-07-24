@@ -55,8 +55,9 @@ class TestsExcelExporter(LocalExportersTestsBase):
                              [
                                 ("ExcelTest4.ipynb", 42343),
                                 ("NestedMarkdown1.ipynb", 6227),
-                                ("ExcelTest.ipynb", 5455)]
-                             )
+                                ("ExcelTest.ipynb", 5455),
+                                ("PandasNA.ipynb", 6010),
+                             ])
     def test_export_compare(self, ipynb_filename, expected_size):
         """
         Does a XLSExporter export the same thing as before?

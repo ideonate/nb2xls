@@ -3,7 +3,7 @@
 
 import nbformat
 
-fn = "./Examples/NestedMarkdown1.ipynb"
+fn = "./Examples/PandasNA.ipynb"
 
 with open(fn, "rt") as f:
     jsontext = f.read()

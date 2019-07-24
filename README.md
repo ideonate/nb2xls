@@ -84,6 +84,9 @@ This code is released under an MIT license.
 
 ## Change Log
 
+0.1.3
+- Working with Pandas/NumPy NaN values
+
 0.1.2
 - Minor changes, mainly to deployment mechanism
 

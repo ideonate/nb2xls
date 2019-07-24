@@ -3,7 +3,7 @@ from io import BytesIO
 import re
 import base64
 from collections.abc import Iterable
-from math import ceil
+from math import ceil, isnan
 
 from nbconvert.exporters import Exporter
 
@@ -93,7 +93,7 @@ class XLSExporter(Exporter):
         nb_copy, resources = super(XLSExporter, self).from_notebook_node(nb, resources, **kw)
 
         output = BytesIO()
-        self.workbook = xlsxwriter.Workbook(output)
+        self.workbook = xlsxwriter.Workbook(output, {'nan_inf_to_errors': True})
 
         self.msxlsstylereg = MdXlsStyleRegistry(self.workbook)
 
@@ -187,7 +187,10 @@ class XLSExporter(Exporter):
                         s = child.get_text()
                         try:
                             f = float(s)
-                            self.worksheet.write_number(self.row, col, f)
+                            if isnan(f):
+                                self.worksheet.write_formula(self.row, col, '=NA()')
+                            else:
+                                self.worksheet.write_number(self.row, col, f)
                         except ValueError:
                             self.worksheet.write(self.row, col, s)
 
