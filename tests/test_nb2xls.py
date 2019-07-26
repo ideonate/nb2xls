@@ -57,7 +57,7 @@ class TestsExcelExporter(LocalExportersTestsBase):
                                 ("NestedMarkdown1.ipynb", 6227),
                                 ("ExcelTest.ipynb", 5455),
                                 ("PandasNA.ipynb", 6010),
-                                #("MarkdownReprDisplay.ipynb", 5557),
+                                ("MarkdownReprDisplay.ipynb", 5557),
                              ])
     def test_export_compare(self, ipynb_filename, expected_size):
         """
