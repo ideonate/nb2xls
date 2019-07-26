@@ -3,7 +3,7 @@
 
 import nbformat
 
-fn = "./Examples/PandasNA.ipynb"
+fn = "./Examples/ExcelTest.ipynb"
 
 with open(fn, "rt") as f:
     jsontext = f.read()
