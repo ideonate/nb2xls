@@ -1,7 +1,7 @@
 # nb2xls - Jupyter notebooks to Excel Spreadsheets
 
-Convert Jupyter notebooks to Excel Spreadsheets, through a new 'Download As' option or via nbconvert on the command 
-line.
+Convert Jupyter notebooks to Excel Spreadsheets (xlsx), through a new 'Download As' option or via nbconvert on the 
+command line.
 
 Respects tables such as Pandas DataFrames. Also exports image data such as matplotlib output.
 
