@@ -84,6 +84,9 @@ This code is released under an MIT license.
 
 ## Change Log
 
+0.1.4
+- Better handling of mimetypes application/json and text/markdown
+
 0.1.3
 - Working with Pandas/NumPy NaN values
 
