@@ -130,37 +130,32 @@ class XLSExporter(Exporter):
         :return:
         """
 
-        outputtypes = {o.output_type: o for o in cell.outputs}
+        for i,o in enumerate(cell.outputs):
 
-        display_data = None
-        if 'execute_result' in outputtypes:
-            display_data = outputtypes['execute_result']
-        elif 'display_data' in outputtypes:
-            display_data = outputtypes['display_data']
+            display_data = None
+            if o.output_type in ('execute_result', 'display_data'):
+                if 'text/html' in o.data:
+                    self._write_texthtml(o.data['text/html'])
+                elif 'text/markdown' in o.data:
+                    self._write_markdown(o.data['text/markdown'])
+                elif 'image/png' in o.data:
+                    width, height = 0, 0
+                    if 'image/png' in o.metadata and set(o.metadata['image/png'].keys()) == {'width', 'height'} :
+                        width, height = o.metadata['image/png']['width'], o.metadata['image/png']['height']
+                    self._write_image(o.data['image/png'], width, height)
+                elif 'application/json' in o.data:
+                    self._write_textplain(repr(o.data['application/json']))
+                elif 'text/plain' in o.data:
+                    self._write_textplain(o.data['text/plain'])
+                else:
+                    self._write_textplain('No convertible mimetype available for source (output {}): {}'.format(i, cell.source))
 
+            elif o.output_type == 'stream':
+                self._write_textplain(o.text)
 
-        if display_data is not None:
-            if 'text/html' in display_data.data:
-                self._write_texthtml(display_data.data['text/html'])
-            elif 'text/markdown' in display_data.data:
-                self._write_markdown(display_data.data['text/markdown'])
-            elif 'image/png' in display_data.data:
-                width, height = 0, 0
-                if 'image/png' in display_data.metadata and set(display_data.metadata['image/png'].keys()) == {'width', 'height'} :
-                    width, height = display_data.metadata['image/png']['width'], display_data.metadata['image/png']['height']
-                self._write_image(display_data.data['image/png'], width, height)
-            elif 'application/json' in display_data.data:
-                self._write_textplain(repr(display_data.data['application/json']))
-            elif 'text/plain' in display_data.data:
-                self._write_textplain(display_data.data['text/plain'])
-            # Fall back on separate stream output
-            elif 'stream' in outputtypes:
-                self._write_textplain(outputtypes['stream'].text)
-            else:
-                self._write_textplain('No convertible outputs available for source: {}'.format(cell.source))
-
-        elif 'stream' in outputtypes:
-            self._write_textplain(outputtypes['stream'].text)
+            if i < len(cell.outputs)-1:
+                # Blank row between outputs, but not at the end
+                self.row += 1
 
     ###
     # Sub-handlers for code cells

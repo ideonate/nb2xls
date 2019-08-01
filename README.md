@@ -13,7 +13,7 @@ This allows you to share your results with non-programmers such that they can st
 
 ![Screenshot of Jupyter Notebook exported to Excel spreadsheet](screenshots/Jupyter2Excel.png)
 
-Please note this is an ALPHA version. Some features may be lost. Please send example ipynb files to me along with 
+Please note this is an ALPHA version. Some notebook features may be lost. Please send example ipynb files to me along with 
 reports of any problems.
 
 Try it out online through Binder:
@@ -84,18 +84,21 @@ This code is released under an MIT license.
 
 ## Change Log
 
-0.1.4
-- Better handling of mimetypes application/json and text/markdown
+0.1.5 (1 Aug 2019)
+- Displays multiple outputs in display_data and execute_data output types
 
-0.1.3
+0.1.4 (26 Jul 2019)
+- Better handling of mimetypes application/json and text/markdown
+ 
+0.1.3 (24 Jul 2019)
 - Working with Pandas/NumPy NaN values
 
-0.1.2
+0.1.2 (11 Jul 2019)
 - Minor changes, mainly to deployment mechanism
 
-0.1.1
+0.1.1 (10 Jul 2019)
 - Displays images over multiple rows for better scrolling
 - Better markdown parsing especially for nested lists
   
-0.0.1
-- Initial release 
+0.0.1 (14 Jun 2019)
+- Initial release
