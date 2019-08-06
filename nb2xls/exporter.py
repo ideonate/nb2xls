@@ -3,6 +3,7 @@ from io import BytesIO
 import re
 import base64
 from collections.abc import Iterable
+from collections import defaultdict
 from math import ceil, isnan
 
 from nbconvert.exporters import Exporter
@@ -197,20 +198,35 @@ class XLSExporter(Exporter):
                     self._write_htmltable(soup)
 
     def _write_htmltable(self, soup):
+        double_emphasis_fmt = self.msxlsstylereg.use_style(['double_emphasis'])
+        rowspans = defaultdict(int)
         for tablerow in soup('tr'):
             col = 1
             for child in tablerow.children:
                 if isinstance(child, Tag):
                     if child.name == 'th' or child.name == 'td':
+                        while rowspans[col] > 1:
+                            rowspans[col] -= 1
+                            col += 1
+
                         s = child.get_text()
+
+                        fmt = double_emphasis_fmt if child.name == 'th' else None
+
                         try:
                             f = float(s)
                             if isnan(f):
-                                self.worksheet.write_formula(self.row, col, '=NA()')
+                                self.worksheet.write_formula(self.row, col, '=NA()', fmt)
                             else:
-                                self.worksheet.write_number(self.row, col, f)
+                                self.worksheet.write_number(self.row, col, f, fmt)
                         except ValueError:
-                            self.worksheet.write(self.row, col, s)
+                            self.worksheet.write(self.row, col, s, fmt)
+
+                        if 'rowspan' in child.attrs and child.attrs['rowspan'].isdigit():
+                            rowspans[col] = int(child.attrs['rowspan'])
+
+                        if 'colspan' in child.attrs and child.attrs['colspan'].isdigit():
+                            col += int(child.attrs['colspan'])-1
 
                         col += 1
             self.row += 1

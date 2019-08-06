@@ -2,6 +2,8 @@
 
 Update __meta__.py (set release version, remove 'dev')
 
+Add version to changelog in README.md
+
 git add the __meta__.py file and git commit
 
 `git tag -a X.X.X -m 'comment'`

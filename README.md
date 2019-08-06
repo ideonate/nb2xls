@@ -84,6 +84,9 @@ This code is released under an MIT license.
 
 ## Change Log
 
+0.1.6 (5 Aug 2019)
+- Better layout and formatting of Pandas tables
+
 0.1.5 (1 Aug 2019)
 - Displays multiple outputs in display_data and execute_data output types
 
