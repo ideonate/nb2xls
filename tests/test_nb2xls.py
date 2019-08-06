@@ -53,12 +53,12 @@ class TestsExcelExporter(LocalExportersTestsBase):
 
     @pytest.mark.parametrize("ipynb_filename,expected_size",
                              [
-                                ("ExcelTest4.ipynb", 42343),
+                                ("ExcelTest4.ipynb", 42166),
                                 ("NestedMarkdown1.ipynb", 6227),
                                 ("ExcelTest.ipynb", 5455),
                                 ("PandasNA.ipynb", 6010),
                                 ("MarkdownReprDisplay.ipynb", 5557),
-                                ("MultipleOutputs.ipynb", 6607),
+                                ("MultipleOutputs.ipynb", 6591),
                              ])
     def test_export_compare(self, ipynb_filename, expected_size):
         """
