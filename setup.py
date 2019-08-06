@@ -46,7 +46,7 @@ include_package_data = True
 zip_safe = False
 
 extra_requirements = {
-    'test': ['pytest', 'testpath', 'openpyxl']
+    'test': ['pytest', 'testpath', 'openpyxl', 'matplotlib']
 }
 
 # ref https://packaging.python.org/tutorials/distributing-packages/
